@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaBot Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 p-5 font-sans">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-center text-blue-600 mb-6">⚙️ InstaBot Control Panel</h1>
+
+        <div class="bg-blue-50 p-4 rounded mb-6">
+            <h2 class="text-xl font-semibold mb-3">1. Global Settings</h2>
+            <div class="flex items-center gap-4 mb-2">
+                <input type="checkbox" id="followerOnly" class="w-5 h-5 text-blue-600">
+                <label for="followerOnly" class="font-medium">ഫോളോവേഴ്സിന് മാത്രം മറുപടി നൽകുക (Followers Only)</label>
+            </div>
+            <div class="flex items-center gap-4 mb-4">
+                <input type="checkbox" id="universalReply" class="w-5 h-5 text-blue-600">
+                <label for="universalReply" class="font-medium">എല്ലാ പോസ്റ്റിനും മറുപടി നൽകുക (Universal Reply)</label>
+            </div>
+            <button onclick="saveSettings()" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">Save Settings</button>
+        </div>
+
+        <div class="bg-green-50 p-4 rounded mb-6">
+            <h2 class="text-xl font-semibold mb-3">2. Reel/Post Rules (DM Setup)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                <input type="text" id="mediaId" placeholder="പോസ്റ്റിൻ്റെ ഐഡി (Media ID)" class="border p-2 rounded w-full">
+                <input type="text" id="dmText" placeholder="അയക്കേണ്ട DM മെസ്സേജ്" class="border p-2 rounded w-full">
+            </div>
+            <button onclick="addRule()" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">Add Rule</button>
+        </div>
+
+        <div class="bg-purple-50 p-4 rounded mb-6">
+            <h2 class="text-xl font-semibold mb-3">3. Public Comments (50 Variations)</h2>
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="newComment" placeholder="പുതിയ റാൻഡം കമൻ്റ് ടൈപ്പ് ചെയ്യുക..." class="border p-2 rounded w-full">
+                <button onclick="addComment()" class="bg-purple-600 text-white px-4 py-2 rounded shadow hover:bg-purple-700">Add</button>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">ഈ കമൻ്റുകളിൽ നിന്നാണ് ഇൻസ്റ്റഗ്രാമിൽ പബ്ലിക് ആയി മറുപടി നൽകുന്നത്.</p>
+        </div>
+
+        <div class="bg-red-50 p-4 rounded">
+            <h2 class="text-xl font-semibold mb-3">4. Negative Keywords (Block List)</h2>
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="newKeyword" placeholder="മോശം വാക്ക് ടൈപ്പ് ചെയ്യുക..." class="border p-2 rounded w-full">
+                <button onclick="addKeyword()" class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700">Block Word</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // പൈത്തണിൽ നിന്ന് സുപ്പർബേസ് വിവരങ്ങൾ സ്വീകരിക്കുന്നു
+        const SUPABASE_URL = '{{ supabase_url }}';
+        const SUPABASE_KEY = '{{ supabase_key }}';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // സെറ്റിംഗ്സ് സേവ് ചെയ്യാനുള്ള ഫംഗ്ഷൻ (ബാക്കി ഫംഗ്ഷനുകൾ പിന്നീട് ചേർക്കാം)
+        async function saveSettings() {
+            const followerOnly = document.getElementById('followerOnly').checked;
+            const universalReply = document.getElementById('universalReply').checked;
+            
+            const { data, error } = await supabase
+                .from('settings')
+                .upsert({ id: 1, follower_only: followerOnly, universal_reply: universalReply })
+                .select();
+                
+            if(error) alert("Error saving settings!");
+            else alert("Settings Saved Successfully!");
+        }
+    </script>
+</body>
+</html>
+
