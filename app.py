@@ -24,67 +24,20 @@ def fetch_media():
         return jsonify({"error": "Missing Instagram access token."}), 500
 
     try:
-        # Step 1: Get Facebook Page ID(s)
-        accounts_url = f"https://graph.facebook.com/v19.0/me/accounts?access_token={IG_TOKEN}"
-        accounts_response = requests.get(accounts_url, timeout=12)
-        accounts_response.raise_for_status()
-        accounts_data = accounts_response.json()
-
-        if accounts_data.get("error"):
-            error_msg = accounts_data["error"].get("message", "Failed to fetch accounts.")
-            print(f"[Error] Step 1 - Accounts API: {error_msg}")
-            return jsonify({"error": error_msg}), 502
-
-        page_id = None
-        if accounts_data.get("data") and len(accounts_data["data"]) > 0:
-            page_id = accounts_data["data"][0].get("id")
-
-        if not page_id:
-            print("[Error] Step 1 - No Facebook Page ID found in response.")
-            return jsonify({"error": "No connected Facebook Page found."}), 404
-
-        print(f"[Step 1] Facebook Page ID: {page_id}")
-
-        # Step 2: Get Instagram Business Account ID
-        page_url = (
-            f"https://graph.facebook.com/v19.0/{page_id}"
-            f"?fields=instagram_business_account&access_token={IG_TOKEN}"
-        )
-        page_response = requests.get(page_url, timeout=12)
-        page_response.raise_for_status()
-        page_data = page_response.json()
-
-        if page_data.get("error"):
-            error_msg = page_data["error"].get("message", "Failed to fetch page details.")
-            print(f"[Error] Step 2 - Page Details API: {error_msg}")
-            return jsonify({"error": error_msg}), 502
-
-        ig_account_id = None
-        if page_data.get("instagram_business_account"):
-            ig_account_id = page_data["instagram_business_account"].get("id")
-
-        if not ig_account_id:
-            print("[Error] Step 2 - No Instagram Business Account ID found. Is this a connected Instagram Page?")
-            return jsonify({"error": "No Instagram Business Account connected to this page."}), 404
-
-        print(f"[Step 2] Instagram Business Account ID: {ig_account_id}")
-
-        # Step 3: Fetch media from Instagram Business Account
         media_url = (
-            f"https://graph.facebook.com/v19.0/{ig_account_id}/media"
+            f"https://graph.instagram.com/v19.0/me/media"
             f"?fields=id,caption,media_url,thumbnail_url,media_type,permalink"
             f"&access_token={IG_TOKEN}"
         )
-        media_response = requests.get(media_url, timeout=12)
-        media_response.raise_for_status()
-        media_data = media_response.json()
+        response = requests.get(media_url, timeout=12)
+        response.raise_for_status()
+        media_data = response.json()
 
         if media_data.get("error"):
             error_msg = media_data["error"].get("message", "Failed to fetch media.")
-            print(f"[Error] Step 3 - Media API: {error_msg}")
-            return jsonify({"error": error_msg}), 502
+            print(f"[Error] Instagram Media API: {error_msg}")
+            return jsonify({"error": error_msg, "details": media_data["error"]}), 502
 
-        print(f"[Step 3] Successfully fetched {len(media_data.get('data', []))} posts.")
         return jsonify(media_data), 200
 
     except requests.exceptions.RequestException as exc:
