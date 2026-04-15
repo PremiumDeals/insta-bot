@@ -7,50 +7,154 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-100 p-5 font-sans">
+<body class="min-h-screen bg-slate-950 text-slate-100 font-sans">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.24),_transparent_20%),radial-gradient(circle_at_bottom_right,_rgba(168,85,247,0.18),_transparent_25%)] pointer-events-none"></div>
 
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold text-center text-blue-600 mb-6">⚙️ InstaBot Control Panel</h1>
-
-        <div class="bg-blue-50 p-4 rounded mb-6">
-            <h2 class="text-xl font-semibold mb-3">1. Global Settings</h2>
-            <div class="flex items-center gap-4 mb-2">
-                <input type="checkbox" id="followerOnly" class="w-5 h-5 text-blue-600">
-                <label for="followerOnly" class="font-medium">ഫോളോവേഴ്സിന് മാത്രം മറുപടി നൽകുക (Followers Only)</label>
+    <div class="relative z-10 flex min-h-screen">
+        <aside class="hidden lg:flex w-72 flex-col gap-6 p-6 bg-slate-900/85 backdrop-blur-xl border-r border-white/10">
+            <div class="space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-14 w-14 items-center justify-center rounded-3xl bg-sky-500/20 text-sky-300 text-xl font-semibold">IB</div>
+                    <div>
+                        <p class="text-lg font-semibold text-white">InstaBot</p>
+                        <p class="text-sm text-slate-400">Premium Dashboard</p>
+                    </div>
+                </div>
+                <p class="text-sm leading-6 text-slate-400">Use this panel to tune your automation workflows, DM rules, public replies, and blocklist settings.</p>
             </div>
-            <div class="flex items-center gap-4 mb-4">
-                <input type="checkbox" id="universalReply" class="w-5 h-5 text-blue-600">
-                <label for="universalReply" class="font-medium">എല്ലാ പോസ്റ്റിനും മറുപടി നൽകുക (Universal Reply)</label>
-            </div>
-            <button onclick="saveSettings()" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">Save Settings</button>
-        </div>
 
-        <div class="bg-green-50 p-4 rounded mb-6">
-            <h2 class="text-xl font-semibold mb-3">2. Reel/Post Rules (DM Setup)</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                <input type="text" id="mediaId" placeholder="പോസ്റ്റിൻ്റെ ഐഡി (Media ID)" class="border p-2 rounded w-full">
-                <input type="text" id="dmText" placeholder="അയക്കേണ്ട DM മെസ്സേജ്" class="border p-2 rounded w-full">
-            </div>
-            <button onclick="addRule()" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">Add Rule</button>
-        </div>
+            <nav class="space-y-2 text-sm">
+                <a href="#" class="flex items-center gap-3 rounded-3xl px-4 py-3 text-slate-200 transition hover:bg-slate-800/80 hover:text-white">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-slate-800 text-sky-300">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h2a1 1 0 011 1v1h6V4a1 1 0 011-1h2a1 1 0 011 1v3H3V4z"/><path fill-rule="evenodd" d="M3 9h14v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm3 3a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+                    </span>
+                    Overview
+                </a>
+                <a href="#" class="flex items-center gap-3 rounded-3xl px-4 py-3 text-slate-200 transition hover:bg-slate-800/80 hover:text-white">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-slate-800 text-emerald-300">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h8a1 1 0 100-2H4z"/></svg>
+                    </span>
+                    DM Rules
+                </a>
+                <a href="#" class="flex items-center gap-3 rounded-3xl px-4 py-3 text-slate-200 transition hover:bg-slate-800/80 hover:text-white">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-slate-800 text-fuchsia-300">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 011-1h8a1 1 0 011 1v12a1 1 0 11-2 0V6H7v10a1 1 0 11-2 0V4z"/></svg>
+                    </span>
+                    Comments
+                </a>
+                <a href="#" class="flex items-center gap-3 rounded-3xl px-4 py-3 text-slate-200 transition hover:bg-slate-800/80 hover:text-white">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-slate-800 text-rose-300">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm4 1a1 1 0 00-1 1v10a1 1 0 102 0V5a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v6a1 1 0 102 0V5a1 1 0 00-1-1z"/></svg>
+                    </span>
+                    Blocklist
+                </a>
+            </nav>
 
-        <div class="bg-purple-50 p-4 rounded mb-6">
-            <h2 class="text-xl font-semibold mb-3">3. Public Comments (50 Variations)</h2>
-            <div class="flex gap-2 mb-3">
-                <input type="text" id="newComment" placeholder="പുതിയ റാൻഡം കമൻ്റ് ടൈപ്പ് ചെയ്യുക..." class="border p-2 rounded w-full">
-                <button onclick="addComment()" class="bg-purple-600 text-white px-4 py-2 rounded shadow hover:bg-purple-700">Add</button>
+            <div class="mt-auto rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-slate-400">
+                Tip: Refresh this panel after updating settings to confirm sync with the webhook backend.
             </div>
-            <p class="text-sm text-gray-600 mb-2">ഈ കമൻ്റുകളിൽ നിന്നാണ് ഇൻസ്റ്റഗ്രാമിൽ പബ്ലിക് ആയി മറുപടി നൽകുന്നത്.</p>
-        </div>
+        </aside>
 
-        <div class="bg-red-50 p-4 rounded">
-            <h2 class="text-xl font-semibold mb-3">4. Negative Keywords (Block List)</h2>
-            <div class="flex gap-2 mb-3">
-                <input type="text" id="newKeyword" placeholder="മോശം വാക്ക് ടൈപ്പ് ചെയ്യുക..." class="border p-2 rounded w-full">
-                <button onclick="addKeyword()" class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700">Block Word</button>
-            </div>
-        </div>
+        <main class="flex-1 p-6 lg:p-10">
+            <header class="mb-8 rounded-[2rem] border border-white/10 bg-slate-900/75 p-8 shadow-[0_35px_80px_-40px_rgba(15,23,42,0.75)] backdrop-blur-xl">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="space-y-3">
+                        <p class="text-sm uppercase tracking-[0.3em] text-sky-300">Instagram Automation</p>
+                        <h1 class="text-4xl font-semibold text-white">Modern SaaS-Style Control Panel</h1>
+                        <p class="max-w-2xl text-slate-400">Use a premium interface for managing comment replies, DM workflows, public response pools, and keyword protection.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button class="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-white transition hover:bg-white/10">Live Webhook</button>
+                        <button class="rounded-full bg-sky-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-400">Sync Now</button>
+                    </div>
+                </div>
+            </header>
 
+            <section class="grid gap-6 xl:grid-cols-[1.3fr_0.9fr]">
+                <div class="space-y-6">
+                    <div class="rounded-[2rem] border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
+                        <div class="mb-6 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.3em] text-sky-300">Global Settings</p>
+                                <h2 class="mt-2 text-2xl font-semibold text-white">Automation Controls</h2>
+                            </div>
+                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-sky-500/15 text-sky-300">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4a8 8 0 100 16 8 8 0 000-16zm0 2a6 6 0 110 12 6 6 0 010-12zm-.75 3.75a.75.75 0 011.5 0V12h1.75a.75.75 0 010 1.5h-2.5A.75.75 0 0111.25 12V9.75z"/></svg>
+                            </div>
+                        </div>
+                        <div class="space-y-4 rounded-[1.75rem] bg-slate-950/70 p-5">
+                            <label class="flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-slate-900/80 p-4 transition hover:bg-slate-900/95">
+                                <div>
+                                    <p class="font-medium text-white">Followers Only</p>
+                                    <p class="text-sm text-slate-400">Only reply when someone already follows your account.</p>
+                                </div>
+                                <input type="checkbox" id="followerOnly" class="h-5 w-5 accent-sky-500" />
+                            </label>
+                            <label class="flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-slate-900/80 p-4 transition hover:bg-slate-900/95">
+                                <div>
+                                    <p class="font-medium text-white">Universal Reply</p>
+                                    <p class="text-sm text-slate-400">Reply to all matching comments regardless of rules.</p>
+                                </div>
+                                <input type="checkbox" id="universalReply" class="h-5 w-5 accent-sky-500" />
+                            </label>
+                            <button onclick="saveSettings()" class="mt-3 inline-flex items-center justify-center rounded-3xl bg-sky-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-400">Save Settings</button>
+                        </div>
+                    </div>
+
+                    <div class="rounded-[2rem] border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
+                        <div class="mb-6 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.3em] text-emerald-300">Reel/Post Rules</p>
+                                <h2 class="mt-2 text-2xl font-semibold text-white">DM Setup</h2>
+                            </div>
+                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-emerald-500/15 text-emerald-300">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v12H5.17L4 17.17V4zm2 2v9.17L6.83 13H18V6H6z"/></svg>
+                            </div>
+                        </div>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <input type="text" id="mediaId" placeholder="പോസ്റ്റിൻ്റെ ഐഡി (Media ID)" class="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20" />
+                            <input type="text" id="dmText" placeholder="അയക്കേണ്ട DM മെസ്സേജ്" class="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20" />
+                        </div>
+                        <button onclick="addRule()" class="mt-5 inline-flex items-center justify-center rounded-3xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400">Add Rule</button>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="rounded-[2rem] border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
+                        <div class="mb-6 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.3em] text-fuchsia-300">Public Comments</p>
+                                <h2 class="mt-2 text-2xl font-semibold text-white">Comment Rotation</h2>
+                            </div>
+                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-fuchsia-500/15 text-fuchsia-300">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M5 4h14v2H5zm0 4h14v2H5zm0 4h9v2H5z"/></svg>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <input type="text" id="newComment" placeholder="പുതിയ റാൻഡം കമൻ്റ് ടൈപ്പ് ചെയ്യുക..." class="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-400/20" />
+                            <button onclick="addComment()" class="inline-flex items-center justify-center rounded-3xl bg-fuchsia-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-fuchsia-400">Add Comment</button>
+                        </div>
+                        <p class="mt-4 text-sm text-slate-400">ഈ കമൻ്റുകളിൽ നിന്നാണ് ഇൻസ്റ്റഗ്രാമിൽ പബ്ലിക് ആയി മറുപടി നൽകുന്നത്.</p>
+                    </div>
+
+                    <div class="rounded-[2rem] border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
+                        <div class="mb-6 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.3em] text-rose-300">Negative Keywords</p>
+                                <h2 class="mt-2 text-2xl font-semibold text-white">Block List</h2>
+                            </div>
+                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-rose-500/15 text-rose-300">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M5 4h14v2H5zm0 4h14v2H5zm0 4h14v2H5z"/></svg>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <input type="text" id="newKeyword" placeholder="മോശം വാക്ക് ടൈപ്പ് ചെയ്യുക..." class="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20" />
+                            <button onclick="addKeyword()" class="inline-flex items-center justify-center rounded-3xl bg-rose-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-rose-400">Block Word</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
     <script>
@@ -59,18 +163,85 @@
         const SUPABASE_KEY = '{{ supabase_key }}';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // സെറ്റിംഗ്സ് സേവ് ചെയ്യാനുള്ള ഫംഗ്ഷൻ (ബാക്കി ഫംഗ്ഷനുകൾ പിന്നീട് ചേർക്കാം)
         async function saveSettings() {
             const followerOnly = document.getElementById('followerOnly').checked;
             const universalReply = document.getElementById('universalReply').checked;
-            
+
             const { data, error } = await supabase
                 .from('settings')
                 .upsert({ id: 1, follower_only: followerOnly, universal_reply: universalReply })
                 .select();
-                
-            if(error) alert("Error saving settings!");
-            else alert("Settings Saved Successfully!");
+
+            if (error) {
+                alert('Settings save failed: ' + error.message);
+                return;
+            }
+            alert('Settings saved successfully!');
+        }
+
+        async function addRule() {
+            const mediaId = document.getElementById('mediaId').value.trim();
+            const dmText = document.getElementById('dmText').value.trim();
+
+            if (!mediaId || !dmText) {
+                alert('Please enter both Media ID and DM message.');
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('media_rules')
+                .insert([{ media_id: mediaId, dm_text: dmText, active: true }]);
+
+            if (error) {
+                alert('Unable to add rule: ' + error.message);
+                return;
+            }
+
+            document.getElementById('mediaId').value = '';
+            document.getElementById('dmText').value = '';
+            alert('Rule added successfully!');
+        }
+
+        async function addComment() {
+            const newComment = document.getElementById('newComment').value.trim();
+
+            if (!newComment) {
+                alert('Please enter a comment before adding.');
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('public_comments')
+                .insert([{ comment_text: newComment }]);
+
+            if (error) {
+                alert('Unable to add comment: ' + error.message);
+                return;
+            }
+
+            document.getElementById('newComment').value = '';
+            alert('Public comment added successfully!');
+        }
+
+        async function addKeyword() {
+            const newKeyword = document.getElementById('newKeyword').value.trim();
+
+            if (!newKeyword) {
+                alert('Please enter a keyword before adding.');
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('negative_keywords')
+                .insert([{ word: newKeyword }]);
+
+            if (error) {
+                alert('Unable to add keyword: ' + error.message);
+                return;
+            }
+
+            document.getElementById('newKeyword').value = '';
+            alert('Negative keyword blocked successfully!');
         }
     </script>
 </body>
