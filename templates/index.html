@@ -134,12 +134,15 @@
         </div>
     </div>
 
-    <script>
-        
+        <script>
+        // Supabase client initialization (must be at the very top of the script)
+        const supabaseUrl = '{{ supabase_url }}';
+        const supabaseKey = '{{ supabase_key }}';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
         document.addEventListener('DOMContentLoaded', () => {
-            const supabase = window.supabase.createClient('{{ supabase_url }}', '{{ supabase_key }}');
             loadMedia();
-            loadGlobalSettings();
+            // Global settings are now per‑video, so we no longer load them here
             loadLists();
             document.getElementById('refreshMediaButton').addEventListener('click', loadMedia);
             document.getElementById('refreshListsButton').addEventListener('click', loadLists);
