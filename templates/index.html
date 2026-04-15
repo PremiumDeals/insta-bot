@@ -156,12 +156,13 @@
             try {
                 const response = await fetch('/api/media');
                 const payload = await response.json();
+                console.log('Instagram media payload:', payload);
 
                 if (!response.ok) {
                     throw new Error(payload.error || 'Unable to load media.');
                 }
 
-                const posts = payload.data || payload || [];
+                const posts = Array.isArray(payload.data) ? payload.data : payload.data || [];
                 if (!posts.length) {
                     emptyState.classList.remove('hidden');
                     return;
@@ -174,8 +175,11 @@
                     const card = document.createElement('article');
                     card.className = 'rounded-[1.75rem] border border-white/10 bg-slate-950/75 overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)] transition hover:shadow-[0_24px_60px_-24px_rgba(56,189,248,0.35)]';
                     card.innerHTML = `
-                        <div class="relative h-64 bg-slate-900/60">
-                            <img src="${imageUrl}" alt="Instagram post" class="h-full w-full object-cover" />
+                        <div class="relative h-64 bg-slate-900/60 overflow-hidden">
+                            <img src="${imageUrl}" alt="Instagram post" referrerpolicy="no-referrer" class="h-full w-full object-cover" onerror="this.style.display='none'; this.parentElement.querySelector('.preview-fallback').style.display='flex'" />
+                            <div class="preview-fallback hidden absolute inset-0 flex items-center justify-center bg-slate-950/90 text-slate-400 text-sm font-medium">
+                                No Preview
+                            </div>
                             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent px-4 py-3 text-slate-100">
                                 <p class="text-sm line-clamp-2">${escapeHtml(caption)}</p>
                             </div>
