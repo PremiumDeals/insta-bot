@@ -1,7 +1,7 @@
 import os
 import random
 import requests
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from supabase import create_client, Client
 
 app = Flask(__name__)
@@ -16,7 +16,8 @@ supabase: Client = create_client(URL, KEY)
 
 @app.route('/')
 def home():
-    return "Instagram Bot is Live & Running!"
+    # ഡാഷ്‌ബോർഡ് ലോഡ് ചെയ്യാനുള്ള കോഡ്
+    return render_template('index.html', supabase_url=URL, supabase_key=KEY)
 
 @app.route('/webhook', methods=['GET'])
 def verify():
@@ -100,4 +101,4 @@ def send_dm(user_id, rule):
 
 if __name__ == '__main__':
     app.run(debug=True)
-      
+    
