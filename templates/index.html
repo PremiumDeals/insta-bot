@@ -137,9 +137,10 @@
     <script>
         const SUPABASE_URL = '{{ supabase_url }}';
         const SUPABASE_KEY = '{{ supabase_key }}';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let supabase = null;
 
         document.addEventListener('DOMContentLoaded', () => {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             loadMedia();
             loadGlobalSettings();
             loadLists();
