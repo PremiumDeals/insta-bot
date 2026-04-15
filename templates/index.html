@@ -3,245 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InstaBot Control Panel</title>
+    <title>Instagram Automation Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100 font-sans">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.24),_transparent_20%),radial-gradient(circle_at_bottom_right,_rgba(168,85,247,0.18),_transparent_25%)] pointer-events-none"></div>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="absolute inset-0 overflow-hidden bg-slate-950">
+        <div class="absolute -left-24 top-16 h-72 w-72 rounded-full bg-sky-500/20 blur-3xl"></div>
+        <div class="absolute right-0 top-24 h-64 w-64 rounded-full bg-fuchsia-500/20 blur-3xl"></div>
+    </div>
 
-    <div class="relative z-10 flex min-h-screen">
-        <aside class="hidden lg:flex w-72 flex-col gap-6 p-6 bg-slate-900/85 backdrop-blur-xl border-r border-white/10">
-            <div class="space-y-4">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-14 w-14 items-center justify-center rounded-3xl bg-sky-500/20 text-sky-300 text-xl font-semibold">IB</div>
-                    <div>
-                        <p class="text-lg font-semibold text-white">InstaBot</p>
-                        <p class="text-sm text-slate-400">Premium Dashboard</p>
-                    </div>
+    <div class="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="mb-8 rounded-[2rem] border border-white/10 bg-slate-900/85 p-8 shadow-[0_35px_80px_-40px_rgba(15,23,42,0.75)] backdrop-blur-xl">
+            <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <p class="text-sm uppercase tracking-[0.35em] text-sky-400">Instagram Automation</p>
+                    <h1 class="mt-3 text-4xl font-semibold tracking-tight text-white">Automation Dashboard</h1>
+                    <p class="mt-3 max-w-2xl text-sm text-slate-400">Manage Instagram posts, auto-reply workflows, comment rotation, and keyword moderation from a single admin panel.</p>
                 </div>
-                <p class="text-sm leading-6 text-slate-400">Use this panel to tune your automation workflows, DM rules, public replies, and blocklist settings.</p>
+                <div class="flex flex-wrap gap-3">
+                    <button id="refreshMediaButton" class="rounded-3xl bg-sky-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-400">Refresh Posts</button>
+                    <button id="refreshListsButton" class="rounded-3xl border border-slate-700 bg-slate-900/80 px-5 py-3 text-sm text-slate-100 transition hover:border-slate-500">Refresh Lists</button>
+                </div>
             </div>
+        </header>
 
-            <nav class="space-y-2 text-sm">
-                <a href="#" class="flex items-center gap-3 rounded-3xl px-4 py-3 text-slate-200 transition hover:bg-slate-800/80 hover:text-white">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-slate-800 text-sky-300">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h2a1 1 0 011 1v1h6V4a1 1 0 011-1h2a1 1 0 011 1v3H3V4z"/><path fill-rule="evenodd" d="M3 9h14v6a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm3 3a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
-                    </span>
-                    Overview
-                </a>
-                <a href="#" class="flex items-center gap-3 rounded-3xl px-4 py-3 text-slate-200 transition hover:bg-slate-800/80 hover:text-white">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-slate-800 text-emerald-300">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h8a1 1 0 100-2H4z"/></svg>
-                    </span>
-                    DM Rules
-                </a>
-                <a href="#" class="flex items-center gap-3 rounded-3xl px-4 py-3 text-slate-200 transition hover:bg-slate-800/80 hover:text-white">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-slate-800 text-fuchsia-300">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 011-1h8a1 1 0 011 1v12a1 1 0 11-2 0V6H7v10a1 1 0 11-2 0V4z"/></svg>
-                    </span>
-                    Comments
-                </a>
-                <a href="#" class="flex items-center gap-3 rounded-3xl px-4 py-3 text-slate-200 transition hover:bg-slate-800/80 hover:text-white">
-                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-slate-800 text-rose-300">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm4 1a1 1 0 00-1 1v10a1 1 0 102 0V5a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v6a1 1 0 102 0V5a1 1 0 00-1-1z"/></svg>
-                    </span>
-                    Blocklist
-                </a>
-            </nav>
-
-            <div class="mt-auto rounded-3xl border border-white/10 bg-white/5 p-4 text-sm text-slate-400">
-                Tip: Refresh this panel after updating settings to confirm sync with the webhook backend.
-            </div>
-        </aside>
-
-        <main class="flex-1 p-6 lg:p-10">
-            <header class="mb-8 rounded-[2rem] border border-white/10 bg-slate-900/75 p-8 shadow-[0_35px_80px_-40px_rgba(15,23,42,0.75)] backdrop-blur-xl">
-                <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                    <div class="space-y-3">
-                        <p class="text-sm uppercase tracking-[0.3em] text-sky-300">Instagram Automation</p>
-                        <h1 class="text-4xl font-semibold text-white">Modern SaaS-Style Control Panel</h1>
-                        <p class="max-w-2xl text-slate-400">Use a premium interface for managing comment replies, DM workflows, public response pools, and keyword protection.</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <button class="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-white transition hover:bg-white/10">Live Webhook</button>
-                        <button class="rounded-full bg-sky-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-400">Sync Now</button>
-                    </div>
-                </div>
-            </header>
-
-            <section class="grid gap-6 xl:grid-cols-[1.3fr_0.9fr]">
-                <div class="space-y-6">
-                    <div class="rounded-[2rem] border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
-                        <div class="mb-6 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm uppercase tracking-[0.3em] text-sky-300">Global Settings</p>
-                                <h2 class="mt-2 text-2xl font-semibold text-white">Automation Controls</h2>
-                            </div>
-                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-sky-500/15 text-sky-300">
-                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4a8 8 0 100 16 8 8 0 000-16zm0 2a6 6 0 110 12 6 6 0 010-12zm-.75 3.75a.75.75 0 011.5 0V12h1.75a.75.75 0 010 1.5h-2.5A.75.75 0 0111.25 12V9.75z"/></svg>
-                            </div>
+        <div class="grid gap-6 xl:grid-cols-[1.55fr_0.95fr]">
+            <section class="space-y-6">
+                <div class="rounded-[2rem] border border-white/10 bg-slate-900/80 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
+                    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.3em] text-sky-300">Section 1</p>
+                            <h2 class="mt-2 text-2xl font-semibold text-white">My Instagram Posts</h2>
                         </div>
-                        <div class="space-y-4 rounded-[1.75rem] bg-slate-950/70 p-5">
-                            <label class="flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-slate-900/80 p-4 transition hover:bg-slate-900/95">
-                                <div>
-                                    <p class="font-medium text-white">Followers Only</p>
-                                    <p class="text-sm text-slate-400">Only reply when someone already follows your account.</p>
-                                </div>
-                                <input type="checkbox" id="followerOnly" class="h-5 w-5 accent-sky-500" />
-                            </label>
-                            <label class="flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-slate-900/80 p-4 transition hover:bg-slate-900/95">
-                                <div>
-                                    <p class="font-medium text-white">Universal Reply</p>
-                                    <p class="text-sm text-slate-400">Reply to all matching comments regardless of rules.</p>
-                                </div>
-                                <input type="checkbox" id="universalReply" class="h-5 w-5 accent-sky-500" />
-                            </label>
-                            <button onclick="saveSettings()" class="mt-3 inline-flex items-center justify-center rounded-3xl bg-sky-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-sky-400">Save Settings</button>
-                        </div>
+                        <p class="max-w-xl text-sm text-slate-400">Select a post and assign an auto-reply DM rule. The dashboard loads your live Instagram media from the connected account.</p>
                     </div>
 
-                    <div class="rounded-[2rem] border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
-                        <div class="mb-6 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm uppercase tracking-[0.3em] text-emerald-300">Reel/Post Rules</p>
-                                <h2 class="mt-2 text-2xl font-semibold text-white">DM Setup</h2>
-                            </div>
-                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-emerald-500/15 text-emerald-300">
-                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v12H5.17L4 17.17V4zm2 2v9.17L6.83 13H18V6H6z"/></svg>
-                            </div>
-                        </div>
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <input type="text" id="mediaId" placeholder="പോസ്റ്റിൻ്റെ ഐഡി (Media ID)" class="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20" />
-                            <input type="text" id="dmText" placeholder="അയക്കേണ്ട DM മെസ്സേജ്" class="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20" />
-                        </div>
-                        <button onclick="addRule()" class="mt-5 inline-flex items-center justify-center rounded-3xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400">Add Rule</button>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="rounded-[2rem] border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
-                        <div class="mb-6 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm uppercase tracking-[0.3em] text-fuchsia-300">Public Comments</p>
-                                <h2 class="mt-2 text-2xl font-semibold text-white">Comment Rotation</h2>
-                            </div>
-                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-fuchsia-500/15 text-fuchsia-300">
-                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M5 4h14v2H5zm0 4h14v2H5zm0 4h9v2H5z"/></svg>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-4">
-                            <input type="text" id="newComment" placeholder="പുതിയ റാൻഡം കമൻ്റ് ടൈപ്പ് ചെയ്യുക..." class="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-400/20" />
-                            <button onclick="addComment()" class="inline-flex items-center justify-center rounded-3xl bg-fuchsia-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-fuchsia-400">Add Comment</button>
-                        </div>
-                        <p class="mt-4 text-sm text-slate-400">ഈ കമൻ്റുകളിൽ നിന്നാണ് ഇൻസ്റ്റഗ്രാമിൽ പബ്ലിക് ആയി മറുപടി നൽകുന്നത്.</p>
-                    </div>
-
-                    <div class="rounded-[2rem] border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
-                        <div class="mb-6 flex items-center justify-between">
-                            <div>
-                                <p class="text-sm uppercase tracking-[0.3em] text-rose-300">Negative Keywords</p>
-                                <h2 class="mt-2 text-2xl font-semibold text-white">Block List</h2>
-                            </div>
-                            <div class="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-rose-500/15 text-rose-300">
-                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M5 4h14v2H5zm0 4h14v2H5zm0 4h14v2H5z"/></svg>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-4">
-                            <input type="text" id="newKeyword" placeholder="മോശം വാക്ക് ടൈപ്പ് ചെയ്യുക..." class="rounded-3xl border border-white/10 bg-slate-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20" />
-                            <button onclick="addKeyword()" class="inline-flex items-center justify-center rounded-3xl bg-rose-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-rose-400">Block Word</button>
-                        </div>
-                    </div>
+                    <div id="mediaGrid" class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3"></div>
+                    <div id="mediaEmpty" class="mt-6 hidden rounded-3xl border border-dashed border-white/10 bg-slate-950/70 p-8 text-center text-slate-400">No posts found yet. Click Refresh Posts to load your Instagram media.</div>
                 </div>
             </section>
-        </main>
+
+            <aside class="space-y-6">
+                <div class="rounded-[2rem] border border-white/10 bg-slate-900/80 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
+                    <div class="mb-4">
+                        <p class="text-sm uppercase tracking-[0.3em] text-emerald-300">Section 2</p>
+                        <h2 class="mt-2 text-2xl font-semibold text-white">Global Automation Settings</h2>
+                        <p class="mt-2 text-sm text-slate-400">Control core behavior for your Instagram auto-reply workflow.</p>
+                    </div>
+
+                    <div class="space-y-4 rounded-[1.75rem] bg-slate-950/70 p-5">
+                        <label class="flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-slate-900/80 p-4 transition hover:bg-slate-900/95">
+                            <div>
+                                <p class="font-medium text-white">Followers Only</p>
+                                <p class="text-sm text-slate-400">Only reply to comments from followers.</p>
+                            </div>
+                            <input type="checkbox" id="followerOnly" class="h-5 w-5 accent-sky-500" />
+                        </label>
+
+                        <label class="flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-slate-900/80 p-4 transition hover:bg-slate-900/95">
+                            <div>
+                                <p class="font-medium text-white">Universal Reply</p>
+                                <p class="text-sm text-slate-400">Reply to every matching comment even if no rule exists.</p>
+                            </div>
+                            <input type="checkbox" id="universalReply" class="h-5 w-5 accent-sky-500" />
+                        </label>
+
+                        <button onclick="saveSettings()" class="mt-3 inline-flex items-center justify-center rounded-3xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400">Save Settings</button>
+                    </div>
+                </div>
+
+                <div class="rounded-[2rem] border border-white/10 bg-slate-900/80 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.85)] backdrop-blur-xl">
+                    <div class="mb-4">
+                        <p class="text-sm uppercase tracking-[0.3em] text-fuchsia-300">Section 3</p>
+                        <h2 class="mt-2 text-2xl font-semibold text-white">Keywords & Comments Pool</h2>
+                        <p class="mt-2 text-sm text-slate-400">Manage the public comment pool and your negative keyword list from one place.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="rounded-[1.75rem] bg-slate-950/70 p-5">
+                            <p class="text-sm font-semibold text-white">Public Comments</p>
+                            <div class="mt-4 flex gap-3">
+                                <input type="text" id="newComment" placeholder="പുതിയ റാൻഡം കമൻ്റ് ടൈപ്പ് ചെയ്യുക..." class="min-w-0 flex-1 rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none transition focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-400/20" />
+                                <button onclick="addComment()" class="rounded-3xl bg-fuchsia-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-fuchsia-400">Add</button>
+                            </div>
+                            <div id="commentList" class="mt-4 space-y-3 max-h-64 overflow-y-auto pr-2"></div>
+                        </div>
+                        <div class="rounded-[1.75rem] bg-slate-950/70 p-5">
+                            <p class="text-sm font-semibold text-white">Negative Keywords</p>
+                            <div class="mt-4 flex gap-3">
+                                <input type="text" id="newKeyword" placeholder="മോശം വാക്ക് ടൈപ്പ് ചെയ്യുക..." class="min-w-0 flex-1 rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20" />
+                                <button onclick="addKeyword()" class="rounded-3xl bg-rose-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-400">Add</button>
+                            </div>
+                            <div id="keywordList" class="mt-4 space-y-3 max-h-64 overflow-y-auto pr-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div id="autoReplyModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+        <div class="w-full max-w-2xl rounded-[2rem] border border-white/10 bg-slate-900/95 p-6 shadow-2xl backdrop-blur-xl">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <p class="text-sm uppercase tracking-[0.3em] text-sky-300">Auto-Reply Rule</p>
+                    <h3 class="mt-2 text-2xl font-semibold text-white">Set DM Auto-Reply</h3>
+                </div>
+                <button onclick="closeAutoReplyModal()" class="rounded-full bg-white/5 px-4 py-2 text-sm text-white transition hover:bg-white/10">Close</button>
+            </div>
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                <div class="space-y-2">
+                    <p class="text-sm text-slate-400">Selected Post ID</p>
+                    <div id="autoReplyMediaLabel" class="rounded-3xl bg-slate-950/80 px-4 py-3 text-sm text-slate-200"></div>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-sm text-slate-400">Post Preview</p>
+                    <div id="autoReplyMediaPreview" class="rounded-3xl bg-slate-950/80 px-4 py-3 text-sm text-slate-200">Choose a post card to assign a message.</div>
+                </div>
+            </div>
+            <div class="mt-6">
+                <label class="block text-sm font-medium text-slate-200">Auto-reply DM Text</label>
+                <textarea id="autoReplyText" rows="4" class="mt-2 w-full rounded-[1.5rem] border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20" placeholder="നിങ്ങളുടെ DM കോപ്പി ഇവിടെ ടൈപ്പ് ചെയ്യുക..."></textarea>
+            </div>
+            <input type="hidden" id="autoReplyMediaId" />
+            <div class="mt-6 flex flex-wrap gap-3 justify-end">
+                <button onclick="closeAutoReplyModal()" class="rounded-3xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white transition hover:bg-white/10">Cancel</button>
+                <button onclick="saveAutoReplyRule()" class="rounded-3xl bg-sky-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-400">Save Rule</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // പൈത്തണിൽ നിന്ന് സുപ്പർബേസ് വിവരങ്ങൾ സ്വീകരിക്കുന്നു
         const SUPABASE_URL = '{{ supabase_url }}';
         const SUPABASE_KEY = '{{ supabase_key }}';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function saveSettings() {
-            const followerOnly = document.getElementById('followerOnly').checked;
-            const universalReply = document.getElementById('universalReply').checked;
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMedia();
+            loadGlobalSettings();
+            loadLists();
+            document.getElementById('refreshMediaButton').addEventListener('click', loadMedia);
+            document.getElementById('refreshListsButton').addEventListener('click', loadLists);
+        });
 
-            const { data, error } = await supabase
-                .from('settings')
-                .upsert({ id: 1, follower_only: followerOnly, universal_reply: universalReply })
-                .select();
+        async function loadMedia() {
+            const grid = document.getElementById('mediaGrid');
+            const emptyState = document.getElementById('mediaEmpty');
+            grid.innerHTML = '';
+            emptyState.classList.add('hidden');
 
-            if (error) {
-                alert('Settings save failed: ' + error.message);
-                return;
+            try {
+                const response = await fetch('/api/media');
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(payload.error || 'Unable to load media.');
+                }
+
+                const posts = payload.data || payload || [];
+                if (!posts.length) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                posts.forEach((item) => {
+                    const imageUrl = item.thumbnail_url || item.media_url || '';
+                    const caption = item.caption ? item.caption.trim().slice(0, 90) : item.media_type;
+
+                    const card = document.createElement('article');
+                    card.className = 'rounded-[1.75rem] border border-white/10 bg-slate-950/75 overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)] transition hover:shadow-[0_24px_60px_-24px_rgba(56,189,248,0.35)]';
+                    card.innerHTML = `
+                        <div class="relative h-64 bg-slate-900/60">
+                            <img src="${imageUrl}" alt="Instagram post" class="h-full w-full object-cover" />
+                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent px-4 py-3 text-slate-100">
+                                <p class="text-sm line-clamp-2">${escapeHtml(caption)}</p>
+                            </div>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <div class="flex items-center justify-between gap-2 text-sm text-slate-400">
+                                <span class="inline-flex items-center gap-2 rounded-full bg-slate-900/80 px-3 py-1">${escapeHtml(item.media_type)}</span>
+                                <a href="${item.permalink}" target="_blank" class="text-sky-300 transition hover:text-sky-200">View post</a>
+                            </div>
+                            <button onclick="openAutoReplyModal('${item.id}')" class="w-full rounded-3xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-400">Set Auto-Reply</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                emptyState.textContent = error.message || 'Failed to load posts.';
+                emptyState.classList.remove('hidden');
             }
-            alert('Settings saved successfully!');
         }
 
-        async function addRule() {
-            const mediaId = document.getElementById('mediaId').value.trim();
-            const dmText = document.getElementById('dmText').value.trim();
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function openAutoReplyModal(mediaId) {
+            document.getElementById('autoReplyMediaId').value = mediaId;
+            document.getElementById('autoReplyText').value = '';
+            document.getElementById('autoReplyMediaLabel').textContent = mediaId;
+            document.getElementById('autoReplyMediaPreview').textContent = 'Enter the DM text to send for this media.';
+            document.getElementById('autoReplyModal').classList.remove('hidden');
+        }
+
+        function closeAutoReplyModal() {
+            document.getElementById('autoReplyModal').classList.add('hidden');
+        }
+
+        async function saveAutoReplyRule() {
+            const mediaId = document.getElementById('autoReplyMediaId').value;
+            const dmText = document.getElementById('autoReplyText').value.trim();
 
             if (!mediaId || !dmText) {
-                alert('Please enter both Media ID and DM message.');
+                alert('Please enter an auto-reply message before saving.');
                 return;
             }
 
             const { data, error } = await supabase
                 .from('media_rules')
-                .insert([{ media_id: mediaId, dm_text: dmText, active: true }]);
+                .upsert([{ media_id: mediaId, dm_text: dmText, active: true }], { onConflict: 'media_id' });
 
             if (error) {
-                alert('Unable to add rule: ' + error.message);
+                alert('Failed to save auto-reply rule: ' + error.message);
                 return;
             }
 
-            document.getElementById('mediaId').value = '';
-            document.getElementById('dmText').value = '';
-            alert('Rule added successfully!');
+            closeAutoReplyModal();
+            alert('Auto-reply rule saved successfully.');
+        }
+
+        async function loadGlobalSettings() {
+            const { data, error } = await supabase
+                .from('settings')
+                .select('*')
+                .maybeSingle();
+
+            if (error) {
+                alert('Could not load global settings: ' + error.message);
+                return;
+            }
+
+            document.getElementById('followerOnly').checked = data?.follower_only || false;
+            document.getElementById('universalReply').checked = data?.universal_reply || false;
+        }
+
+        async function saveSettings() {
+            const followerOnly = document.getElementById('followerOnly').checked;
+            const universalReply = document.getElementById('universalReply').checked;
+
+            const { error } = await supabase
+                .from('settings')
+                .upsert(
+                    { id: 1, follower_only: followerOnly, universal_reply: universalReply },
+                    { onConflict: 'id' }
+                );
+
+            if (error) {
+                alert('Failed to save settings: ' + error.message);
+                return;
+            }
+
+            alert('Global settings updated successfully.');
+        }
+
+        async function loadLists() {
+            await Promise.all([loadComments(), loadKeywords()]);
+        }
+
+        async function loadComments() {
+            const { data, error } = await supabase
+                .from('public_comments')
+                .select('id,comment_text')
+                .order('id', { ascending: false });
+
+            if (error) {
+                alert('Could not load comments pool: ' + error.message);
+                return;
+            }
+
+            const list = document.getElementById('commentList');
+            list.innerHTML = data.length
+                ? data.map(commentCard).join('')
+                : '<div class="rounded-3xl bg-slate-950/80 px-4 py-3 text-sm text-slate-400">No comments added yet.</div>';
+        }
+
+        function commentCard(item) {
+            return `
+                <div class="flex items-start justify-between gap-3 rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100">
+                    <p class="min-w-0 text-slate-200">${escapeHtml(item.comment_text)}</p>
+                    <button onclick="deleteComment(${item.id})" class="rounded-2xl bg-white/5 px-3 py-2 text-xs text-slate-300 transition hover:bg-white/10">Delete</button>
+                </div>
+            `;
+        }
+
+        async function deleteComment(id) {
+            if (!confirm('Delete this public comment?')) return;
+
+            const { error } = await supabase
+                .from('public_comments')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Failed to delete comment: ' + error.message);
+                return;
+            }
+
+            alert('Comment deleted successfully.');
+            loadComments();
         }
 
         async function addComment() {
             const newComment = document.getElementById('newComment').value.trim();
-
             if (!newComment) {
                 alert('Please enter a comment before adding.');
                 return;
             }
 
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('public_comments')
                 .insert([{ comment_text: newComment }]);
 
             if (error) {
-                alert('Unable to add comment: ' + error.message);
+                alert('Failed to add comment: ' + error.message);
                 return;
             }
 
             document.getElementById('newComment').value = '';
-            alert('Public comment added successfully!');
+            alert('Comment added successfully.');
+            loadComments();
+        }
+
+        async function loadKeywords() {
+            const { data, error } = await supabase
+                .from('negative_keywords')
+                .select('id,word')
+                .order('id', { ascending: false });
+
+            if (error) {
+                alert('Could not load keywords: ' + error.message);
+                return;
+            }
+
+            const list = document.getElementById('keywordList');
+            list.innerHTML = data.length
+                ? data.map(keywordCard).join('')
+                : '<div class="rounded-3xl bg-slate-950/80 px-4 py-3 text-sm text-slate-400">No keywords blocked yet.</div>';
+        }
+
+        function keywordCard(item) {
+            return `
+                <div class="flex items-start justify-between gap-3 rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-100">
+                    <p class="min-w-0 text-slate-200">${escapeHtml(item.word)}</p>
+                    <button onclick="deleteKeyword(${item.id})" class="rounded-2xl bg-white/5 px-3 py-2 text-xs text-slate-300 transition hover:bg-white/10">Delete</button>
+                </div>
+            `;
+        }
+
+        async function deleteKeyword(id) {
+            if (!confirm('Delete this keyword?')) return;
+
+            const { error } = await supabase
+                .from('negative_keywords')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Failed to delete keyword: ' + error.message);
+                return;
+            }
+
+            alert('Keyword deleted successfully.');
+            loadKeywords();
         }
 
         async function addKeyword() {
             const newKeyword = document.getElementById('newKeyword').value.trim();
-
             if (!newKeyword) {
                 alert('Please enter a keyword before adding.');
                 return;
             }
 
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('negative_keywords')
                 .insert([{ word: newKeyword }]);
 
             if (error) {
-                alert('Unable to add keyword: ' + error.message);
+                alert('Failed to add keyword: ' + error.message);
                 return;
             }
 
             document.getElementById('newKeyword').value = '';
-            alert('Negative keyword blocked successfully!');
+            alert('Keyword added successfully.');
+            loadKeywords();
         }
     </script>
 </body>

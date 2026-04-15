@@ -16,12 +16,38 @@ supabase: Client = create_client(URL, KEY)
 
 @app.route('/')
 def home():
-    # ഡാഷ്‌ബോർഡ് ലോഡ് ചെയ്യാനുള്ള കോഡ്
     return render_template('index.html', supabase_url=URL, supabase_key=KEY)
+
+@app.route('/api/media', methods=['GET'])
+def fetch_media():
+    if not IG_TOKEN:
+        return jsonify({"error": "Missing Instagram access token."}), 500
+
+    api_url = (
+        "https://graph.facebook.com/v19.0/me/media"
+        "?fields=id,caption,media_url,thumbnail_url,media_type,permalink"
+        f"&access_token={IG_TOKEN}"
+    )
+
+    try:
+        response = requests.get(api_url, timeout=12)
+        response.raise_for_status()
+        data = response.json()
+
+        if isinstance(data, dict) and data.get("error"):
+            return jsonify({
+                "error": data["error"].get("message", "Graph API error."),
+                "details": data["error"]
+            }), 502
+
+        return jsonify(data), 200
+    except requests.exceptions.RequestException as exc:
+        return jsonify({"error": "Failed to fetch Instagram media.", "details": str(exc)}), 502
+    except Exception as exc:
+        return jsonify({"error": "Internal server error.", "details": str(exc)}), 500
 
 @app.route('/webhook', methods=['GET'])
 def verify():
-    # Meta Webhook Verification
     token = request.args.get("hub.verify_token")
     challenge = request.args.get("hub.challenge")
     if token == VERIFY_TOKEN:
@@ -31,16 +57,16 @@ def verify():
 @app.route('/webhook', methods=['POST'])
 def handle_event():
     data = request.json
-    
-    # കമൻ്റ് വരുമ്പോൾ മാത്രം പ്രവർത്തിക്കുന്നു
+
     if 'entry' in data:
         for entry in data['entry']:
             for change in entry.get('changes', []):
                 if change.get('field') == 'comments':
                     comment_data = change['value']
                     process_comment(comment_data)
-                    
+
     return jsonify({"status": "success"}), 200
+
 
 def process_comment(comment):
     comment_id = comment.get('id')
@@ -49,29 +75,23 @@ def process_comment(comment):
     user_id = comment.get('from', {}).get('id')
     username = comment.get('from', {}).get('username')
 
-    # 1. നെഗറ്റീവ് കീവേഡ് ചെക്ക്
-    neg_words = supabase.table("negative_keywords").select("word").execute().data
+    neg_words = supabase.table("negative_keywords").select("word").execute().data or []
     for word in neg_words:
         if word['word'].lower() in comment_text:
-            return 
+            return
 
-    # 2. കൂൾഡൗൺ ചെക്ക് (ഒരേ ആൾക്ക് വീണ്ടും മെസ്സേജ് പോകാതിരിക്കാൻ)
     recent_log = supabase.table("activity_logs").select("*").eq("user_id", user_id).eq("media_id", media_id).execute().data
     if recent_log:
         return
 
-    # 3. ഗ്ലോബൽ സെറ്റിംഗ്സ്
-    settings = supabase.table("settings").select("*").single().execute().data
-    
-    # 4. വീഡിയോയ്ക്കുള്ള പ്രത്യേക റൂൾ ഉണ്ടോ എന്ന് നോക്കുന്നു
+    settings = supabase.table("settings").select("*").single().execute().data or {}
     rule = supabase.table("media_rules").select("*").eq("media_id", media_id).eq("active", True).execute().data
     rule_data = rule[0] if rule else None
-    
+
     if rule_data or settings.get('universal_reply'):
         send_dm(user_id, rule_data)
         post_public_reply(comment_id)
-        
-        # ലോഗ് സേവ് ചെയ്യുന്നു
+
         supabase.table("activity_logs").insert({
             "user_id": user_id,
             "username": username,
@@ -79,6 +99,7 @@ def process_comment(comment):
             "media_id": media_id,
             "action_type": "DM_SENT"
         }).execute()
+
 
 def post_public_reply(comment_id):
     replies = supabase.table("public_comments").select("comment_text").execute().data
@@ -88,10 +109,11 @@ def post_public_reply(comment_id):
         payload = {"message": random_reply, "access_token": IG_TOKEN}
         requests.post(url, data=payload)
 
+
 def send_dm(user_id, rule):
     url = f"https://graph.facebook.com/v19.0/me/messages"
     message_text = rule.get('dm_text') if rule else "ഹലോ! കൂടുതൽ വിവരങ്ങൾക്കായി ലിങ്കിൽ ക്ലിക്ക് ചെയ്യുക."
-    
+
     payload = {
         "recipient": {"id": user_id},
         "message": {"text": message_text},
